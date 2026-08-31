@@ -1,4 +1,5 @@
 import math
+
 from binary_check import Node
 
 
