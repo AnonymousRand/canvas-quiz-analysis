@@ -1,9 +1,11 @@
 // compile with `g++ binary_check.cpp -o binary_check`
 
-#include "binary_check.h"
 #include <iostream>
 #include <random>
 #include <unordered_set>
+#include <vector>
+
+#include "binary_check.h"
 
 
 Node::Node(int a, int b, int rootVal, Node* parent) {
@@ -16,8 +18,8 @@ Node::Node(int a, int b, int rootVal, Node* parent) {
     this->parent = parent;
     this->left = nullptr;
     this->right = nullptr;
-    this->crossed = false;
-    this->correct = false;
+    this->isCrossed = false;
+    this->isCorrect = false;
 
     if (rootVal > 1) {
         int leftVal = (int) (rootVal / 2); // totally necessary cast
@@ -44,7 +46,7 @@ Node::Node(int a, int b, int rootVal, Node* parent) {
             answers.insert(rng(e1));
         }
         for (const int answer : answers) {
-            this->leaves[answer]->correct = true;
+            this->leaves[answer]->isCorrect = true;
         }
     }
 }
@@ -62,10 +64,10 @@ Node::~Node() {
 }
 
 
-int Node::getScore() {
+int Node::calcScore() {
     int score = 0;
     for (const Node* leaf : this->leaves) {
-        if (leaf->correct) {
+        if (leaf->isCorrect) {
             score++;
         }
     }
@@ -73,43 +75,43 @@ int Node::getScore() {
 }
 
 
-void Node::traverse(int& attemptCount, int& remainingTargets) {
+void Node::traverse(int& attemptCount, int& remainingTargetCount) {
     // terminate recursion if we've found all
-    if (remainingTargets == 0) {
+    if (remainingTargetCount == 0) {
         return;
     }
 
-    // visit node and slaughter sibling
-    if (!this->crossed) {
+    // visit node and hug sibling to death :3
+    if (!this->isCrossed) {
         attemptCount++;
         if (this->parent != nullptr) {
-            this->parent->right->crossed = true;
+            this->parent->right->isCrossed = true;
         }
     }
 
     // if leaf node; if no `attemptCount++`, then this is functionally a deduction
     if (this->rootVal == 1) {
-        if (this->correct) {
-            remainingTargets--;
+        if (this->isCorrect) {
+            remainingTargetCount--;
         }
         return;
     }
 
     // if score is 0, skip entire subtree ("flip")
-    if (this->getScore() == 0) {
+    if (this->calcScore() == 0) {
         return;
     }
 
     // recursively check left and right children
     if (this->left != nullptr) {
-        this->left->traverse(attemptCount, remainingTargets);
-        if (remainingTargets == 0) {
+        this->left->traverse(attemptCount, remainingTargetCount);
+        if (remainingTargetCount == 0) {
             return;
         }
     }
     if (this->right != nullptr) {
-        this->right->traverse(attemptCount, remainingTargets);
-        if (remainingTargets == 0) {
+        this->right->traverse(attemptCount, remainingTargetCount);
+        if (remainingTargetCount == 0) {
             return;
         }
     }
@@ -118,11 +120,11 @@ void Node::traverse(int& attemptCount, int& remainingTargets) {
 
 int Node::runBinCheck() {
     int attemptCount = 0;
-    int remainingTargets = this->a;
+    int remainingTargetCount = this->a;
 
     // recursively check left and right children, and keep "global" values for these 2 values
-    this->left->traverse(attemptCount, remainingTargets);
-    this->right->traverse(attemptCount, remainingTargets);
+    this->left->traverse(attemptCount, remainingTargetCount);
+    this->right->traverse(attemptCount, remainingTargetCount);
 
     return attemptCount;
 }

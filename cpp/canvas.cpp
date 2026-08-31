@@ -1,11 +1,12 @@
 // compile with `g++ binary_check.cpp canvas.cpp -lgmpxx -lgmp -o canvas`
 // make sure to `sudo apt install libgmp-dev`
 
-#include "binary_check.h"
 #include <algorithm>
 #include <cmath>
 #include <gmpxx.h>
 #include <iostream>
+
+#include "binary_check.h"
 
 
 const int BIN_CHECK_TRIAL_COUNT = 1000;
@@ -24,7 +25,7 @@ mpf_class factorial(int n) {
 }
 
 
-mpf_class combination(int n, int r) {
+mpf_class comb(int n, int r) {
     if (r == 0 || n == r) {
         return 1;
     }
@@ -54,10 +55,11 @@ mpf_class genTree(
             newProb = oldProb;
         } else {
             newAttemptCount++;              // remember that fourth attempts are overlapped and do not count
-            newProb = oldProb \
-                    * combination(incorrectBefore, incorrectBefore - j) \
-                    * pow((float) 1 / (optionCount - depth), incorrectBefore - j) \
-                    * pow((float) (optionCount - depth - 1) / (optionCount - depth), j);
+            newProb =
+                oldProb
+                * comb(incorrectBefore, incorrectBefore - j)
+                * std::pow((double) 1 / (optionCount - depth), incorrectBefore - j)
+                * std::pow((double) (optionCount - depth - 1) / (optionCount - depth), j);
         }
 
         // if we've reached an ending, calculate attempts * total prob and add to ev
@@ -82,7 +84,8 @@ mpf_class genTree(
                         Node tree(a, b, -1, nullptr);
                         binCheckTotalAttemptCount += tree.runBinCheck();
                     }
-                    binCheckMemoize[a][b] = (float) binCheckTotalAttemptCount / BIN_CHECK_TRIAL_COUNT;
+                    binCheckMemoize[a][b] =
+                        (float) binCheckTotalAttemptCount / BIN_CHECK_TRIAL_COUNT;
                 }
             }
             newAttemptCount += binCheckMemoize[a][b];

@@ -14,8 +14,8 @@ class Node:
         self.left = None
         self.right = None
         self.leaves = []
-        self.crossed = False
-        self.correct = False
+        self.is_crossed = False
+        self.is_correct = False
 
         if root_val > 1:
             left_val = root_val // 2
@@ -33,57 +33,60 @@ class Node:
         if parent is None:
             answers = random.sample(range(b), a)
             for i in answers:
-                self.leaves[i].correct = True
+                self.leaves[i].is_correct = True
 
-    def get_score(self):
+    def calc_score(self):
         score = 0
         for leaf in self.leaves:
-            if leaf.correct:
+            if leaf.is_correct:
                 score += 1
         return score
 
-    def traverse(self, attempt_count, remaining_targets):
+    def traverse(self, attempt_count, remaining_target_count):
         # terminate recursion if we've found all
-        if remaining_targets == 0:
+        if remaining_target_count == 0:
             return attempt_count, 0
 
-        # visit node and slaughter sibling
-        if not self.crossed:
+        # visit node and hug sibling to death :3
+        if not self.is_crossed:
             attempt_count += 1
             if self.parent is not None:
-                self.parent.right.crossed = True
+                self.parent.right.is_crossed = True
 
         # if leaf node; if no `attempt_count += 1`, then this is functionally a deduction
         if self.root_val == 1:
-            if self.correct:
-                return attempt_count, remaining_targets - 1
+            if self.is_correct:
+                return attempt_count, remaining_target_count - 1
             else:
-                return attempt_count, remaining_targets
+                return attempt_count, remaining_target_count
 
         # if score is 0, skip entire subtree ("flip")
-        if self.get_score() == 0:
-            return attempt_count, remaining_targets
+        if self.calc_score() == 0:
+            return attempt_count, remaining_target_count
 
         # recursively check left and right children
         if self.left is not None:
-            attempt_count, remaining_targets = self.left.traverse(attempt_count, remaining_targets)
-            if remaining_targets == 0:
-                return attempt_count, remaining_targets
+            attempt_count, remaining_target_count = self.left.traverse(attempt_count, remaining_target_count)
+            if remaining_target_count == 0:
+                return attempt_count, remaining_target_count
         if self.right is not None:
-            attempt_count, remaining_targets = self.right.traverse(attempt_count, remaining_targets)
-            if remaining_targets == 0:
-                return attempt_count, remaining_targets
+            attempt_count, remaining_target_count = self.right.traverse(attempt_count, remaining_target_count)
+            if remaining_target_count == 0:
+                return attempt_count, remaining_target_count
 
-        return attempt_count, remaining_targets
+        return attempt_count, remaining_target_count
 
     def run_bin_check(self):
         attempt_count = 0
-        remaining_targets = self.a
+        remaining_target_count = self.a
 
         # recursively check left and right children, and keep "global" values for these 2 values
-        attempt_count, remaining_targets = self.left.traverse(attempt_count, remaining_targets)
-        attempt_count, remaining_targets = self.right.traverse(attempt_count, remaining_targets)
-
+        attempt_count, remaining_target_count = self.left.traverse(
+            attempt_count, remaining_target_count
+        )
+        attempt_count, remaining_target_count = self.right.traverse(
+            attempt_count, remaining_target_count
+        )
         return attempt_count
 
 

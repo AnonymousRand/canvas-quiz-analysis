@@ -12,14 +12,14 @@ class Node {
         int a;
         int b;
         int rootVal;
-        bool crossed;
-        bool correct;
+        bool isCrossed;
+        bool isCorrect;
 
         Node* left;
         Node* right;
         Node* parent;
         std::vector<Node*> leaves;
 
-        int getScore();
-        void traverse(int& attemptCount, int& remainingTargets);
+        int calcScore();
+        void traverse(int& attemptCount, int& remainingTargetCount);
 };

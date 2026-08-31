@@ -22,10 +22,12 @@ def gen_tree(k, option_count, branch_count=None, old_score=0, old_attempt_count=
             new_prob = old_prob
         else:
             new_attempt_count += 1       # remember that fourth attempts are overlapped and do not count
-            new_prob = old_prob \
-                    * math.comb(incorrect_before, incorrect_before - j) \
-                    * math.pow(1 / (option_count - depth), incorrect_before - j) \
-                    * math.pow((option_count - depth - 1) / (option_count - depth), j)
+            new_prob = (
+                old_prob
+                * math.comb(incorrect_before, incorrect_before - j)
+                * math.pow(1 / (option_count - depth), incorrect_before - j)
+                * math.pow((option_count - depth - 1) / (option_count - depth), j)
+            )
         
         # if we've reached an ending, calculate attempts * total prob and add to ev
         if new_score == k:
